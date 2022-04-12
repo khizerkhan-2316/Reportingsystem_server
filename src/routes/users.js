@@ -5,9 +5,9 @@ const {
   userAuth,
   serializeUser,
   checkRole,
-} = require('../utils/Auth');
+} = require('../controllers/auth.controller');
 
-const { getAllUsers } = require('../utils/users.js');
+const { getAllUsers } = require('../controllers/user.controller.js');
 
 const router = express.Router();
 
