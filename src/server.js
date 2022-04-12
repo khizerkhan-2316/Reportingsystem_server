@@ -3,7 +3,7 @@ const express = require('express');
 const { success, error } = require('consola');
 const { connect } = require('mongoose');
 const passport = require('passport');
-const morgan = require('morgan');
+//const morgan = require('morgan');
 
 require('dotenv').config();
 
@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 app.use(passport.initialize());
-app.use(morgan('tiny'));
+//app.use(morgan('tiny'));
 
 require('./middlewares/passport.js')(passport);
 
