@@ -41,7 +41,7 @@ const registerUser = async (userDets, role, res) => {
         ? 'https://reporting-system.netlify.app/'
         : 'https://reporting-system.netlify.app/admin';
 
-    await registrationMail(email, role, url);
+    //await registrationMail(email, role, url);
 
     return res.status(201).json({ message: 'User created', success: true });
   } catch (err) {
