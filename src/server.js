@@ -7,8 +7,8 @@ const passport = require('passport');
 
 require('dotenv').config();
 
-//const { DB } = require('./config/index.js');
-const { DB } = require('./LocalConfig.js');
+const { DB } = require('./config/index.js');
+//const { DB } = require('./LocalConfig.js');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
