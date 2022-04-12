@@ -20,7 +20,6 @@ app.use(passport.initialize());
 require('./middlewares/passport.js')(passport);
 
 app.use('/api/users', require('./routes/users.js'));
-app.use('/api/countries', require('./routes/Countries.js'));
 
 app.get('/', (req, res) => {
   console.log(process.env.APP_MAIL_PASSWORD);
