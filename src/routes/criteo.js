@@ -8,15 +8,20 @@ const {
 const { userAuth, checkRole } = require('../controllers/auth.controller');
 const router = express.Router();
 
-router.get('/auth', async (req, res) => {
+router.get('/auth', userAuth, checkRole('admin'), async (req, res) => {
   await criteoToken(res);
 });
 
-router.post('/stats/monthly', async (req, res) => {
-  await stats(req, res);
-});
+router.post(
+  '/stats/monthly',
+  userAuth,
+  checkRole('admin'),
+  async (req, res) => {
+    await stats(req, res);
+  }
+);
 
-router.get('/stats/monthly', async (req, res) => {
+router.get('/stats/monthly', userAuth, checkRole('admin'), async (req, res) => {
   await getMontlyStats(res);
 });
 
