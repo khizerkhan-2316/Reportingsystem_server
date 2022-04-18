@@ -3,11 +3,16 @@ const {
   registerUser,
   userLogin,
   userAuth,
-  serializeUser,
+
   checkRole,
 } = require('../controllers/auth.controller');
 
-const { getAllUsers } = require('../controllers/user.controller.js');
+const {
+  getAllUsers,
+  updateUser,
+} = require('../controllers/user.controller.js');
+
+const { serializeUser } = require('../helpers/serializeUser.js');
 
 const router = express.Router();
 
@@ -20,7 +25,7 @@ router.post('/register-admin', async (req, res) => {
 });
 
 router.post('/login-user', async (req, res) => {
-  await userLogin(req.body, 'user', res);
+  await userLogin(req.body, 'user', res, 'active');
 });
 
 router.post('/login-admin', async (req, res) => {
@@ -36,8 +41,14 @@ router.get('/admin', userAuth, checkRole('admin'), async (req, res) => {
   return res.json(serializeUser(req.user));
 });
 
+router.put('/:id', async (req, res) => {
+  console.log(req.params);
+  console.log(req.body);
+  await updateUser(req, res);
+});
+
 router.get('/', userAuth, checkRole('admin'), async (req, res) => {
-  await getAllUsers(res, 'user');
+  await getAllUsers(res, 'user', serializeUser);
 });
 
 router.get('/user-protected', userAuth, checkRole('user'), async (req, res) => {

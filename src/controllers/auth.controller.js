@@ -4,8 +4,9 @@ const jwt = require('jsonwebtoken');
 const { SECRET } = require('../config/index.js');
 const passport = require('passport');
 const { registrationMail } = require('./Mail/RegistrationMail');
+const { validateUsername, validateEmail } = require('../helpers/validate.js');
 
-const registerUser = async (userDets, role, res) => {
+const registerUser = async (userDets, role, res, ...state) => {
   const { email, username, password } = userDets;
 
   const usernameNotTaken = await validateUsername(username);
@@ -32,6 +33,7 @@ const registerUser = async (userDets, role, res) => {
       ...userDets,
       password: hashedPassword,
       role,
+      state,
     });
 
     await newUser.save();
@@ -41,7 +43,7 @@ const registerUser = async (userDets, role, res) => {
         ? 'https://reporting-system.netlify.app/'
         : 'https://reporting-system.netlify.app/admin';
 
-    //await registrationMail(email, role, url);
+    await registrationMail(email, role, url);
 
     return res.status(201).json({ message: 'User created', success: true });
   } catch (err) {
@@ -98,18 +100,6 @@ const userLogin = async (userCreds, role, res) => {
   }
 };
 
-const validateUsername = async (username) => {
-  const user = await User.findOne({ username });
-
-  return user ? false : true;
-};
-
-const validateEmail = async (email) => {
-  const user = await User.findOne({ email });
-
-  return user ? false : true;
-};
-
 const checkRole = (roles) => (req, res, next) =>
   !roles.includes(req.user.role)
     ? res.status(401).json({ message: 'Unauthorized', success: false })
@@ -117,23 +107,9 @@ const checkRole = (roles) => (req, res, next) =>
 
 const userAuth = passport.authenticate('jwt', { session: false });
 
-const serializeUser = (user) => {
-  return {
-    username: user.username,
-    name: user.name,
-    email: user.email,
-    name: user.name,
-    role: user.role,
-    _id: user._id,
-    updatedAt: user.updatedAt,
-    createdAt: user.createdAt,
-  };
-};
-
 module.exports = {
   registerUser,
   userLogin,
   userAuth,
-  serializeUser,
   checkRole,
 };

@@ -8,7 +8,6 @@ const passport = require('passport');
 require('dotenv').config();
 
 const { DB } = require('./config/index.js');
-//const { DB } = require('./LocalConfig.js');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -20,9 +19,9 @@ app.use(passport.initialize());
 require('./middlewares/passport.js')(passport);
 
 app.use('/api/users', require('./routes/users.js'));
+app.use('/api/criteo', require('./routes/criteo.js'));
 
 app.get('/', (req, res) => {
-  console.log(process.env.APP_MAIL_PASSWORD);
   res.status(200).json({ sucess: true, message: 'Production' });
 });
 

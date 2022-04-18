@@ -27,6 +27,12 @@ const UserSchema = new Schema(
       enum: ['user', 'admin'],
     },
 
+    state: {
+      type: String,
+      required: false,
+      enum: ['active', 'inactive'],
+    },
+
     username: {
       type: String,
       required: true,
@@ -41,4 +47,5 @@ const UserSchema = new Schema(
   { timestamps: true }
 );
 
-module.exports = model('users', UserSchema);5
+module.exports = model('users', UserSchema);
+5;
