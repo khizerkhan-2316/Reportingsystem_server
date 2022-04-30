@@ -10,6 +10,7 @@ const {
 const {
   getAllUsers,
   updateUser,
+  updateAllUsers,
 } = require('../controllers/user.controller.js');
 
 const { serializeUser } = require('../helpers/serializeUser.js');
@@ -32,8 +33,7 @@ router.post('/login-admin', async (req, res) => {
   await userLogin(req.body, 'admin', res);
 });
 
-router.get('/profile', userAuth, checkRole('user'), async (req, res) => {
-  console.log(req.user);
+router.get('/profile', userAuth, async (req, res) => {
   return res.json(serializeUser(req.user));
 });
 
@@ -49,6 +49,10 @@ router.put('/:id', async (req, res) => {
 
 router.get('/', userAuth, checkRole('admin'), async (req, res) => {
   await getAllUsers(res, 'user', serializeUser);
+});
+
+router.post('/', async (req, res) => {
+  await updateAllUsers(res, 'user');
 });
 
 router.get('/user-protected', userAuth, checkRole('user'), async (req, res) => {

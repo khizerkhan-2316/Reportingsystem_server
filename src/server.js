@@ -11,6 +11,10 @@ const { DB } = require('./config/index.js');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+process.on('uncaughtException', function (error) {
+  console.log(error.stack);
+});
+
 app.use(cors());
 app.use(express.json());
 app.use(passport.initialize());
@@ -20,6 +24,7 @@ require('./middlewares/passport.js')(passport);
 
 app.use('/api/users', require('./routes/users.js'));
 app.use('/api/criteo', require('./routes/criteo.js'));
+app.use('/api/dealers', require('./routes/dealers.js'));
 
 app.get('/', (req, res) => {
   res.status(200).json({ sucess: true, message: 'Production' });

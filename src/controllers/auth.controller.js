@@ -6,7 +6,7 @@ const passport = require('passport');
 const { registrationMail } = require('./Mail/RegistrationMail');
 const { validateUsername, validateEmail } = require('../helpers/validate.js');
 
-const registerUser = async (userDets, role, res, ...state) => {
+const registerUser = async (userDets, role, res) => {
   const { email, username, password } = userDets;
 
   const usernameNotTaken = await validateUsername(username);
@@ -33,17 +33,17 @@ const registerUser = async (userDets, role, res, ...state) => {
       ...userDets,
       password: hashedPassword,
       role,
-      state,
     });
 
+    console.log(newUser);
     await newUser.save();
-
+    /*
     const url =
       role === 'user'
         ? 'https://reporting-system.netlify.app/'
         : 'https://reporting-system.netlify.app/admin';
 
-    await registrationMail(email, role, url);
+    await registrationMail(email, role, url); */
 
     return res.status(201).json({ message: 'User created', success: true });
   } catch (err) {

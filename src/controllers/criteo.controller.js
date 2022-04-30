@@ -27,7 +27,6 @@ const stats = async (req, res) => {
     );
 
     const dataFromDb = await getMonthlyStatsFromDB();
-    console.log(dataFromDb);
     if (dataFromDb) {
       return res
         .status(400)
@@ -79,4 +78,10 @@ const getCampaign = async (req, res) => {
   }
 };
 
-module.exports = { criteoToken, stats, getMontlyStats, getCampaign };
+module.exports = {
+  criteoToken,
+  stats,
+  getMontlyStats,
+  getCampaign,
+  getMonthlyStatsFromDB,
+};

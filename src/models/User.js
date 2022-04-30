@@ -1,11 +1,6 @@
 const { Schema, model } = require('mongoose');
 const UserSchema = new Schema(
   {
-    id: {
-      type: Number,
-      required: false,
-    },
-
     dealerId: {
       type: Number,
       required: false,
@@ -23,14 +18,16 @@ const UserSchema = new Schema(
 
     role: {
       type: String,
-      default: 'user',
       enum: ['user', 'admin'],
+      default: 'user',
+      required: true,
     },
 
     state: {
       type: String,
-      required: false,
+      required: true,
       enum: ['active', 'inactive'],
+      default: 'active',
     },
 
     username: {
@@ -48,4 +45,3 @@ const UserSchema = new Schema(
 );
 
 module.exports = model('users', UserSchema);
-5;
