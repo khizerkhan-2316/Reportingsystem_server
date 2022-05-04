@@ -1,9 +1,12 @@
 const axios = require('axios');
 const { body, criteoConfig } = require('../config/criteo.auth.config.js');
-const { getFirstDayOfMonth, getLastDayOfMonth } = require('../helpers/date.js');
+const {
+  getFirstDayOfPreviousMonth,
+  getLastDayOfPreviousMonth,
+} = require('../helpers/date.js');
 const MonthlyStatsCriteo = require('../models/MonthlyStatsCriteo.js');
 
-const criteoToken = async (res) => {
+const criteoToken = async () => {
   try {
     const { data } = await axios.post(
       'https://api.criteo.com/oauth2/token',
@@ -11,29 +14,35 @@ const criteoToken = async (res) => {
       criteoConfig
     );
 
-    res.status(200).json({ success: true, data });
+    return data;
   } catch (e) {
-    res.status(400).json({ message: e, success: false });
+    return e;
   }
 };
 
-const stats = async (req, res) => {
+const insertPreviousMonthStats = async (res) => {
   try {
-    const { authorization } = req.body;
-    const { data } = await axios.get(
-      `https://api.criteo.com/legacy/offsite-ads/stats/sellers?IntervalSize=Month&startDate=${getFirstDayOfMonth()}&endDate=${getLastDayOfMonth}&advertiserId=44478`,
-
-      { headers: { authorization: `Bearer ${authorization}` } }
-    );
-
-    const dataFromDb = await getMonthlyStatsFromDB();
+    const dataFromDb = await getPreviousMonthlyStatsFromDB();
+    const data = await getPreviousMonthsData();
     if (dataFromDb) {
-      return res
-        .status(400)
-        .json({ message: 'Already got data for this month', success: false });
+      await MonthlyStatsCriteo.updateOne(
+        { month: getFirstDayOfPreviousMonth() },
+        {
+          $set: {
+            columns: data.columns,
+            data: data.data,
+          },
+        }
+      );
+
+      return res.status(200).json({ message: 'Updated Stats', success: true });
     }
 
-    await MonthlyStatsCriteo.insertMany(data);
+    await MonthlyStatsCriteo.insertMany({
+      columns: data.columns,
+      data: data.data,
+      month: getFirstDayOfPreviousMonth(),
+    });
 
     return res
       .status(200)
@@ -43,45 +52,31 @@ const stats = async (req, res) => {
   }
 };
 
-const getMontlyStats = async (res) => {
-  const data = await getMonthlyStatsFromDB();
-  return data
-    ? res.status(200).json(data)
-    : res
-        .status(404)
-        .json({ message: 'Monthly data not found', success: false });
+const getPreviousMonthsData = async () => {
+  const { access_token } = await criteoToken();
+
+  const { data } = await axios.get(
+    `https://api.criteo.com/legacy/offsite-ads/stats/sellers?IntervalSize=Month&startDate=${getFirstDayOfPreviousMonth()}&endDate=${getLastDayOfPreviousMonth()}&advertiserId=44478`,
+
+    { headers: { authorization: `Bearer ${access_token}` } }
+  );
+
+  return data;
 };
 
-const getMonthlyStatsFromDB = async () => {
+const getPreviousMonthlyStatsFromDB = async () => {
   const data = await MonthlyStatsCriteo.findOne({
-    createdAt: {
-      $gte: getFirstDayOfMonth(),
-      $lte: getLastDayOfMonth(),
+    month: {
+      $gte: getFirstDayOfPreviousMonth(),
+      $lte: getLastDayOfPreviousMonth(),
     },
   });
 
   return data;
 };
 
-const getCampaign = async (req, res) => {
-  try {
-    const { authorization } = req.body;
-    const { data } = await axios.get(
-      'https://api.criteo.com/2022-01/marketing-solutions/campaigns/227979',
-      { headers: { authorization: `Bearer ${authorization}` } }
-    );
-
-    res.status(200).json({ message: 'Extracted campaign data', success: true });
-  } catch (e) {
-    console.log(e);
-    res.status(400).json({ message: e, success: false });
-  }
-};
-
 module.exports = {
   criteoToken,
-  stats,
-  getMontlyStats,
-  getCampaign,
-  getMonthlyStatsFromDB,
+  insertPreviousMonthStats,
+  getPreviousMonthlyStatsFromDB,
 };

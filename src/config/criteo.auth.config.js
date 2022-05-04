@@ -4,10 +4,6 @@ const body = new URLSearchParams({
   client_secret: process.env.CRITEO_SECRET,
 });
 
-const { client_id, client_secret } = body;
-
-console.log(client_id, client_secret);
-
 const criteoConfig = {
   Accept: 'text/plain',
   'Content-Type': 'application/x-www-form-urlencoded',

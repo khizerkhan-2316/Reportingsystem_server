@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const Dealer = require('../models/Dealer');
 const MonthlyStatsCriteo = require('../models/MonthlyStatsCriteo');
-const { getMonthlyStatsFromDB } = require('./criteo.controller');
+const { getPreviousMonthlyStatsFromDB } = require('./criteo.controller');
 const { validateUsername, validateEmail } = require('../helpers/validate.js');
 const bcrypt = require('bcryptjs');
 const {
@@ -24,8 +24,9 @@ const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { name, username, email, state } = req.body;
-    const user = await User.find({ dealerId: id });
+    const { name, username, email, state, password } = req.body;
+
+    let user = await User.find({ dealerId: id });
 
     if (!user) {
       return res
@@ -48,6 +49,7 @@ const updateUser = async (req, res) => {
         .status(409)
         .json({ message: 'Email already in use', success: false });
     }
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     await User.updateOne(
       { dealerId: id },
@@ -57,6 +59,7 @@ const updateUser = async (req, res) => {
           username,
           email,
           state,
+          password: hashedPassword,
         },
       }
     );
@@ -69,13 +72,13 @@ const updateUser = async (req, res) => {
   }
 };
 
+const updateAdminUser = (res, role) => {};
+
 const updateAllUsers = async (res, role) => {
   try {
     const dealers = await Dealer.find({});
     const users = await User.find({ role: role });
-    const stats = await getMonthlyStatsFromDB();
-
-    console.log(stats);
+    const stats = await getPreviousMonthlyStatsFromDB();
 
     await insertUsers(dealers, users, stats);
 
@@ -86,10 +89,13 @@ const updateAllUsers = async (res, role) => {
 };
 
 const insertUsers = async (dealers, users, stats) => {
-  stats.data.forEach(async (data) => {
+  await stats.data.forEach(async (data) => {
     const dealerId = Number(data[1]);
-    const isRegistered = checkIfUserIsRegistered(users, dealerId);
-    if (!isRegistered) {
+    const clicks = Number(data[4]);
+
+    const isRegistered = await checkIfUserIsRegistered(users, dealerId);
+
+    if (!isRegistered && clicks > 0) {
       const dealer = dealers.find((dealer) => dealer.dealerId === dealerId);
 
       if (dealer) {
@@ -128,7 +134,6 @@ const registerUser = async (userDets, role) => {
       role,
     });
 
-    console.log(newUser);
     await newUser.save();
   } catch (err) {
     throw Error(err);

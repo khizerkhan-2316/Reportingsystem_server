@@ -41,9 +41,7 @@ router.get('/admin', userAuth, checkRole('admin'), async (req, res) => {
   return res.json(serializeUser(req.user));
 });
 
-router.put('/:id', async (req, res) => {
-  console.log(req.params);
-  console.log(req.body);
+router.put('/:id', userAuth, checkRole('admin'), async (req, res) => {
   await updateUser(req, res);
 });
 
@@ -51,7 +49,7 @@ router.get('/', userAuth, checkRole('admin'), async (req, res) => {
   await getAllUsers(res, 'user', serializeUser);
 });
 
-router.post('/', async (req, res) => {
+router.post('/', userAuth, checkRole('admin'), async (req, res) => {
   await updateAllUsers(res, 'user');
 });
 

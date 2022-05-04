@@ -2,6 +2,11 @@ const { Schema, model } = require('mongoose');
 
 const MonthlyStatsCriteoSchema = new Schema(
   {
+    month: {
+      type: Date,
+      required: true,
+    },
+
     columns: {
       type: Array,
       required: true,
