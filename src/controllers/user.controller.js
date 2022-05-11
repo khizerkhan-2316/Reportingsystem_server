@@ -91,11 +91,10 @@ const updateAllUsers = async (res, role) => {
 const insertUsers = async (dealers, users, stats) => {
   await stats.data.forEach(async (data) => {
     const dealerId = Number(data[1]);
-    const clicks = Number(data[4]);
 
     const isRegistered = await checkIfUserIsRegistered(users, dealerId);
 
-    if (!isRegistered && clicks > 0) {
+    if (!isRegistered) {
       const dealer = dealers.find((dealer) => dealer.dealerId === dealerId);
 
       if (dealer) {

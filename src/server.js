@@ -3,7 +3,7 @@ const express = require('express');
 const { success, error } = require('consola');
 const { connect } = require('mongoose');
 const passport = require('passport');
-//const morgan = require('morgan');
+// const morgan = require('morgan');
 
 require('dotenv').config();
 
@@ -20,12 +20,13 @@ process.on('uncaughtException', function (error) {
 app.use(cors());
 app.use(express.json());
 app.use(passport.initialize());
-//app.use(morgan('tiny'));
+// app.use(morgan('tiny'));
 
 require('./middlewares/passport.js')(passport);
 
 app.use('/api/users', require('./routes/users.js'));
 app.use('/api/criteo', require('./routes/criteo.js'));
+app.use('/api/analytics', require('./routes/analytics.js'));
 app.use('/api/dealers', require('./routes/dealers.js'));
 
 app.get('/', (req, res) => {

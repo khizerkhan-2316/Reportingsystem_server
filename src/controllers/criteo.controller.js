@@ -38,15 +38,11 @@ const insertPreviousMonthStats = async (res) => {
       return res.status(200).json({ message: 'Updated Stats', success: true });
     }
 
-    await MonthlyStatsCriteo.insertMany({
-      columns: data.columns,
-      data: data.data,
-      month: getFirstDayOfPreviousMonth(),
-    });
+    await MonthlyStatsCriteo.insertMany(data);
 
     return res
       .status(200)
-      .json({ message: 'Inserted stats in DB', success: true, data });
+      .json({ message: 'Inserted stats in DB', success: true });
   } catch (e) {
     return res.status(400).json({ message: e, success: false });
   }
@@ -60,8 +56,12 @@ const getPreviousMonthsData = async () => {
 
     { headers: { authorization: `Bearer ${access_token}` } }
   );
+   const filteredDealers = data.data.filter((dealer) => !filterOutDealersWithNoStats(dealer));
+  return { columns: data.columns, data: filteredDealers, month: getFirstDayOfPreviousMonth()};
+};
 
-  return data;
+const filterOutDealersWithNoStats = (row) => {
+  return row[4] === 0;
 };
 
 const getPreviousMonthlyStatsFromDB = async () => {
