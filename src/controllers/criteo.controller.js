@@ -20,13 +20,32 @@ const criteoToken = async () => {
   }
 };
 
-const insertPreviousMonthStats = async (res) => {
+const getSpeceficMonthsData = async (startdate, enddate) => {
+  const { access_token } = await criteoToken();
+
+  const { data } = await axios.get(
+    `https://api.criteo.com/legacy/offsite-ads/stats/sellers?IntervalSize=Month&startDate=${startdate}&endDate=${enddate}&advertiserId=44478`,
+
+    { headers: { authorization: `Bearer ${access_token}` } }
+  );
+  const filteredDealers = data.data.filter(
+    (dealer) => !filterOutDealersWithNoStats(dealer)
+  );
+  return {
+    columns: data.columns,
+    data: filteredDealers,
+    month: startdate,
+  };
+};
+
+const insertSpeceficMonthStats = async (startdate, enddate, res) => {
   try {
-    const dataFromDb = await getPreviousMonthlyStatsFromDB();
-    const data = await getPreviousMonthsData();
+    const dataFromDb = await getSpeceficStatsFromDB(startdate, enddate);
+    const data = await getSpeceficMonthsData(startdate, enddate);
+
     if (dataFromDb) {
       await MonthlyStatsCriteo.updateOne(
-        { month: getFirstDayOfPreviousMonth() },
+        { month: startdate },
         {
           $set: {
             columns: data.columns,
@@ -35,40 +54,32 @@ const insertPreviousMonthStats = async (res) => {
         }
       );
 
-      return res.status(200).json({ message: 'Updated Stats', success: true });
+      return res
+        .status(200)
+        .json({ message: 'Updated Stats', success: true, heading: 'Updated!' });
     }
 
     await MonthlyStatsCriteo.insertMany(data);
 
-    return res
-      .status(200)
-      .json({ message: 'Inserted stats in DB', success: true });
+    return res.status(200).json({
+      message: 'Inserted stats in DB',
+      success: true,
+      heading: 'Inserted!',
+    });
   } catch (e) {
     return res.status(400).json({ message: e, success: false });
   }
-};
-
-const getPreviousMonthsData = async () => {
-  const { access_token } = await criteoToken();
-
-  const { data } = await axios.get(
-    `https://api.criteo.com/legacy/offsite-ads/stats/sellers?IntervalSize=Month&startDate=${getFirstDayOfPreviousMonth()}&endDate=${getLastDayOfPreviousMonth()}&advertiserId=44478`,
-
-    { headers: { authorization: `Bearer ${access_token}` } }
-  );
-   const filteredDealers = data.data.filter((dealer) => !filterOutDealersWithNoStats(dealer));
-  return { columns: data.columns, data: filteredDealers, month: getFirstDayOfPreviousMonth()};
 };
 
 const filterOutDealersWithNoStats = (row) => {
   return row[4] === 0;
 };
 
-const getPreviousMonthlyStatsFromDB = async () => {
+const getSpeceficStatsFromDB = async (startdate, enddate) => {
   const data = await MonthlyStatsCriteo.findOne({
     month: {
-      $gte: getFirstDayOfPreviousMonth(),
-      $lte: getLastDayOfPreviousMonth(),
+      $gte: startdate,
+      $lte: enddate,
     },
   });
 
@@ -77,6 +88,6 @@ const getPreviousMonthlyStatsFromDB = async () => {
 
 module.exports = {
   criteoToken,
-  insertPreviousMonthStats,
-  getPreviousMonthlyStatsFromDB,
+  insertSpeceficMonthStats,
+  getSpeceficStatsFromDB,
 };

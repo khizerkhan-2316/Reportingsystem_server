@@ -13,9 +13,9 @@ const { DB } = require('./config/LocalConfig.js');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-process.on('uncaughtException', function (error) {
+/*process.on('uncaughtException', function (error) {
   console.log(error.stack);
-});
+}); */
 
 app.use(cors());
 app.use(express.json());

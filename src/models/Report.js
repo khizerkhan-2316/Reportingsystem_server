@@ -60,6 +60,16 @@ const ReportSchema = new Schema(
       type: Number,
       required: true,
     },
+
+    monthlyConversions: {
+      type: Number,
+      required: true,
+    },
+
+    pricePerConversion: {
+      type: Number,
+      required: true,
+    },
   },
   { timestamps: true }
 );

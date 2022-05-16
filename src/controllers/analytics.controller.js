@@ -25,14 +25,18 @@ const insertPreviousMonthStats = async (res) => {
         }
       );
 
-      return res.status(200).json({ message: 'Updated Stats', success: true });
+      return res
+        .status(200)
+        .json({ message: 'Updated Stats', success: true, heading: 'Updated!' });
     }
 
     await MonthlyStatsAnalytics.insertMany(stats);
 
-    return res
-      .status(200)
-      .json({ message: 'Inserted stats in DB', success: true });
+    return res.status(200).json({
+      message: 'Inserted stats in DB',
+      success: true,
+      heading: 'Inserted!',
+    });
   } catch (e) {
     return res.status(400).json({ message: e, success: false });
   }
@@ -49,9 +53,11 @@ const getPreviousMonthStatsFromAnalytics = async () => {
       range: 'Criteo Forhandler/konv',
     });
 
-    const data = getRows.data.values.filter(
-      (row, index) => index >= 3 && !filterOutDealersWithNoStats(row)
-    );
+    const data = getRows.data.values
+      .filter((row, index) => index >= 3 && !filterOutDealersWithNoStats(row))
+      .map((row) => {
+        return [...row, getFirstDayOfPreviousMonth()];
+      });
 
     return {
       month: getFirstDayOfPreviousMonth(),

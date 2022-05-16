@@ -1,7 +1,11 @@
 const User = require('../models/User');
 const Dealer = require('../models/Dealer');
 const MonthlyStatsCriteo = require('../models/MonthlyStatsCriteo');
-const { getPreviousMonthlyStatsFromDB } = require('./criteo.controller');
+const {
+  getFirstDayOfPreviousMonth,
+  getLastDayOfPreviousMonth,
+} = require('../helpers/date.js');
+const { getSpeceficStatsFromDB } = require('./criteo.controller');
 const { validateUsername, validateEmail } = require('../helpers/validate.js');
 const bcrypt = require('bcryptjs');
 const {
@@ -78,11 +82,18 @@ const updateAllUsers = async (res, role) => {
   try {
     const dealers = await Dealer.find({});
     const users = await User.find({ role: role });
-    const stats = await getPreviousMonthlyStatsFromDB();
+    const stats = await getSpeceficStatsFromDB(
+      getFirstDayOfPreviousMonth(),
+      getLastDayOfPreviousMonth()
+    );
 
     await insertUsers(dealers, users, stats);
 
-    res.status(200).json({ success: true, message: 'Updated users' });
+    res.status(200).json({
+      success: true,
+      message: 'Updated users',
+      heading: 'Updated users!',
+    });
   } catch (e) {
     res.status(200).json({ success: false, message: 'Unable to update users' });
   }
@@ -92,8 +103,7 @@ const insertUsers = async (dealers, users, stats) => {
   await stats.data.forEach(async (data) => {
     const dealerId = Number(data[1]);
 
-    const isRegistered = await checkIfUserIsRegistered(users, dealerId);
-
+    const isRegistered = checkIfUserIsRegistered(users, dealerId);
     if (!isRegistered) {
       const dealer = dealers.find((dealer) => dealer.dealerId === dealerId);
 

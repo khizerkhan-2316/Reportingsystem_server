@@ -35,7 +35,6 @@ const registerUser = async (userDets, role, res) => {
       role,
     });
 
-    console.log(newUser);
     await newUser.save();
     /*
     const url =

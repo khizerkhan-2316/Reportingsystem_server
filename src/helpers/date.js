@@ -30,9 +30,16 @@ const getLastDayOfPreviousMonth = () => {
   return moment(lastDay).format('YYYY-MM-DD');
 };
 
+const formatDate = (dateToFormat) => {
+  const date = new Date(dateToFormat);
+
+  return moment(date).format('YYYY-MM-DD');
+};
+
 module.exports = {
   getFirstDayOfMonth,
   getLastDayOfMonth,
   getFirstDayOfPreviousMonth,
   getLastDayOfPreviousMonth,
+  formatDate,
 };

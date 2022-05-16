@@ -26,7 +26,7 @@ router.post('/register-admin', async (req, res) => {
 });
 
 router.post('/login-user', async (req, res) => {
-  await userLogin(req.body, 'user', res, 'active');
+  await userLogin(req.body, 'user', res);
 });
 
 router.post('/login-admin', async (req, res) => {
@@ -58,7 +58,6 @@ router.get('/user-protected', userAuth, checkRole('user'), async (req, res) => {
 });
 
 router.get('/admin-protected', userAuth, async (req, res) => {
-  console.log(req);
   res.status(200).json('Success');
 });
 
