@@ -2,7 +2,11 @@ const MonthlyStatsAnalytics = require('../models/MonthlyStatsAnalytics.js');
 const MonthlyStatsCriteo = require('../models/MonthlyStatsCriteo.js');
 const User = require('../models/User.js');
 const Report = require('../models/Report.js');
-const { formatDate } = require('../helpers/date.js');
+const {
+  formatDate,
+  getFirstDayOfMonth,
+  getLastDayOfMonth,
+} = require('../helpers/date.js');
 const getStatsFromDB = async () => {
   const criteoStats = await MonthlyStatsCriteo.find({}).sort({ month: 'desc' });
   const analytics = await MonthlyStatsAnalytics.find({}).sort({
@@ -41,8 +45,6 @@ const createReports = async (res) => {
     const reportFromDB = await Report.find({ dealerId });
     const reports = calculateDataForDealer(dealerId, criteoStats, analytics);
     const newReports = onlyInLeft(reports, reportFromDB, isSameReport);
-
-    console.log(newReports);
 
     if (reportFromDB && newReports.length === 0) {
       await Report.updateMany({ dealerId }, { $set: { reports } });
@@ -84,11 +86,22 @@ const calculateDataForDealer = (dealerId, criteostats, analytics) => {
     });
   });
 
+  console.log(reports);
+
   return reports;
 };
 
 const generateReport = (dealer, analyticsDealer) => {
   const ctr = calculateCTR(dealer[4], dealer[3]);
+  const cost = dealer[5] * 2;
+
+  console.log('Cost:');
+  console.log(cost);
+  console.log('---');
+
+  console.log('Oprindelig kost');
+  console.log(dealer[5]);
+
   if (analyticsDealer === null) {
     return {
       dealerId: Number(dealer[1]),
@@ -96,7 +109,7 @@ const generateReport = (dealer, analyticsDealer) => {
       ctr,
       impressions: dealer[3],
       clicks: dealer[4],
-      cost: dealer[5],
+      cost,
       mail: 0,
       phone: 0,
       otherAds: 0,
@@ -116,7 +129,7 @@ const generateReport = (dealer, analyticsDealer) => {
     ctr,
     impressions: dealer[3],
     clicks: dealer[4],
-    cost: dealer[5],
+    cost,
     mail: Number(analyticsDealer[4]),
     phone: Number(analyticsDealer[5]),
     otherAds: Number(analyticsDealer[6]),
@@ -141,4 +154,25 @@ const calculateCTR = (clicks, impressions) => {
   return ((clicks / impressions) * 100).toFixed(2);
 };
 
-module.exports = { createReports, getReports };
+const getMonthlyReports = async (res) => {
+  try {
+    const reports = await Report.find({
+      createdAt: {
+        $gte: getFirstDayOfMonth(),
+        $lte: getLastDayOfMonth(),
+      },
+    });
+
+    const uniqueDealerIds = [
+      ...new Set(reports.map((report) => report.dealerId)),
+    ];
+
+    const dealers = await User.find({ dealerId: { $in: uniqueDealerIds } });
+
+    res.status(200).json({ success: true, data: dealers });
+  } catch (e) {
+    res.status(500).json({ success: false, data: e });
+  }
+};
+
+module.exports = { createReports, getReports, getMonthlyReports };
