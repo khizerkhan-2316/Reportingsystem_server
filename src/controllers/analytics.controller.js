@@ -29,7 +29,6 @@ const insertPreviousMonthStats = async (res) => {
         .status(200)
         .json({ message: 'Updated Stats', success: true, heading: 'Updated!' });
     }
-    console.log(stats);
     await MonthlyStatsAnalytics.insertMany(stats);
     return res.status(200).json({
       message: 'Inserted stats in DB',
