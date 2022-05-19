@@ -54,7 +54,7 @@ const getPreviousMonthStatsFromAnalytics = async () => {
       range: 'Criteo Forhandler/konv',
     });
 
-    const data = getRows.data.values
+    const data = await getRows.data.values
       .filter((row, index) => index >= 3 && !filterOutDealersWithNoStats(row))
       .map((row) => {
         return [...row, getFirstDayOfPreviousMonth()];
