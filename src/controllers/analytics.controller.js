@@ -29,7 +29,7 @@ const insertPreviousMonthStats = async (res) => {
         .status(200)
         .json({ message: 'Updated Stats', success: true, heading: 'Updated!' });
     }
-
+        console.log(stats)
     await MonthlyStatsAnalytics.insertMany(stats);
 
     return res.status(200).json({
@@ -38,7 +38,7 @@ const insertPreviousMonthStats = async (res) => {
       heading: 'Inserted!',
     });
   } catch (e) {
-    console.log(e)
+    console.log(e);
     return res.status(400).json({ message: e, success: false });
   }
 };
