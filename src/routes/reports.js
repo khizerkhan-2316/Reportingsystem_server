@@ -12,7 +12,7 @@ router.post('/', userAuth, async (req, res) => {
   return await createReports(res);
 });
 
-router.get('/month', async (req, res) => {
+router.get('/month', userAuth, async (req, res) => {
   await getMonthlyReports(res);
 });
 

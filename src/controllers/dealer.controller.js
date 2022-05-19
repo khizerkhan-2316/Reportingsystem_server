@@ -22,7 +22,6 @@ const insertDealers = async (dealers, res) => {
 
     res.status(201).json({ success: true });
   } catch (e) {
-    console.log(e);
     res.status(400).json({ success: false, error: e });
   }
 };

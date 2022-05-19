@@ -3,7 +3,6 @@ const path = require('path');
 
 const analyticsAuth = async () => {
   const file = path.join(__dirname, '../', 'files', 'credentials.json');
-
   const auth = new google.auth.GoogleAuth({
     keyFile: file,
     scopes: 'https://www.googleapis.com/auth/spreadsheets',

@@ -53,12 +53,4 @@ router.post('/', userAuth, checkRole('admin'), async (req, res) => {
   await updateAllUsers(res, 'user');
 });
 
-router.get('/user-protected', userAuth, checkRole('user'), async (req, res) => {
-  res.status(200).json({ message: 'User routhe', success: true });
-});
-
-router.get('/admin-protected', userAuth, async (req, res) => {
-  res.status(200).json('Success');
-});
-
 module.exports = router;

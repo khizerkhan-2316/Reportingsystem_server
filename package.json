@@ -4,7 +4,7 @@
   "description": "Server",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "env-cmd -f .env.development jest --testEnvironment=node --runInBand ./test --forceExit",
     "start": "env-cmd -f .env.production node ./src/server.js",
     "dev": "env-cmd -f .env.development nodemon ./src/server.js"
   },
@@ -31,7 +31,10 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "jest": "^28.1.0",
+    "mongodb-memory-server": "^8.5.2",
     "morgan": "^1.10.0",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "supertest": "^6.2.3"
   }
 }

@@ -7,7 +7,7 @@ const options = {
   secretOrKey: SECRET,
 };
 
-module.exports = (passport) => {
+module.exports = async (passport) => {
   passport.use(
     new Strategy(options, async (payload, done) => {
       await User.findById(payload.user_id)

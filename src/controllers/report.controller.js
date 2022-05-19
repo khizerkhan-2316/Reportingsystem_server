@@ -22,15 +22,6 @@ const isSameReport = (createdReports, reportsFromDb) => {
   );
 };
 
-/*
-const newReports = (createdReports, reportsFromDb, compareFunction) =>
-  createdReports.filter(
-    (report) =>
-      !reportsFromDb.some((reportFromDb) =>
-        compareFunction(report, reportFromDb)
-      )
-  ); */
-
 const onlyInLeft = (left, right, compareFunction) =>
   left.filter(
     (leftValue) =>
@@ -38,28 +29,54 @@ const onlyInLeft = (left, right, compareFunction) =>
   );
 
 const createReports = async (res) => {
-  const { criteoStats, analytics } = await getStatsFromDB();
-  const users = await User.find({});
-  users.forEach(async (user) => {
-    const { dealerId } = user;
-    const reportFromDB = await Report.find({ dealerId });
-    const reports = calculateDataForDealer(dealerId, criteoStats, analytics);
-    const newReports = onlyInLeft(reports, reportFromDB, isSameReport);
+  try {
+    const { criteoStats, analytics } = await getStatsFromDB();
+    const users = await User.find({});
+    users.forEach(async (user, index) => {
+      const { dealerId } = user;
 
-    if (reportFromDB && newReports.length === 0) {
-      await Report.updateMany({ dealerId }, { $set: { reports } });
-    }
+      const reportFromDB = await Report.find({ dealerId });
+      const reports = calculateDataForDealer(dealerId, criteoStats, analytics);
+      const newReports = onlyInLeft(reports, reportFromDB, isSameReport);
+      const oldReports = onlyInLeft(reports, newReports, isSameReport);
 
-    if (newReports.length > 0) {
-      await Report.insertMany(newReports);
-    }
-  });
+      if (reportFromDB) {
+        await oldReports.forEach(async (report) => {
+          await Report.updateOne(
+            { month: report.month, dealerId: report.dealerId },
+            {
+              $set: {
+                ctr: report.ctr,
+                impressions: report.impressions,
+                clicks: report.clicks,
+                cost: report.cost,
+                mail: report.mail,
+                phone: report.phone,
+                otherAds: report.otherAds,
+                shared: report.shared,
+                clickHomepage: report.clickHomepage,
+                favorite: report.favorite,
+                monthlyConversions: report.monthlyConversions,
+                pricePerConversion: report.pricePerConversion,
+              },
+            }
+          );
+        });
+      }
 
-  res.status(200).json({
-    success: true,
-    message: 'Created reports',
-    heading: 'Created!',
-  });
+      if (newReports.length > 0) {
+        await Report.insertMany(newReports);
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Created reports',
+      heading: 'Created!',
+    });
+  } catch (e) {
+    res.status(400).json({ error: e, success: false });
+  }
 };
 
 const calculateDataForDealer = (dealerId, criteostats, analytics) => {
@@ -86,21 +103,12 @@ const calculateDataForDealer = (dealerId, criteostats, analytics) => {
     });
   });
 
-  console.log(reports);
-
   return reports;
 };
 
 const generateReport = (dealer, analyticsDealer) => {
   const ctr = calculateCTR(dealer[4], dealer[3]);
   const cost = dealer[5] * 2;
-
-  console.log('Cost:');
-  console.log(cost);
-  console.log('---');
-
-  console.log('Oprindelig kost');
-  console.log(dealer[5]);
 
   if (analyticsDealer === null) {
     return {
@@ -168,11 +176,30 @@ const getMonthlyReports = async (res) => {
     ];
 
     const dealers = await User.find({ dealerId: { $in: uniqueDealerIds } });
+    const createdAt = reports[0].createdAt;
 
-    res.status(200).json({ success: true, data: dealers });
+    const serializedDealers = dealers.map((dealer) => {
+      const dealerReports = reports.filter(
+        (report) => report.dealerId === dealer.dealerId
+      );
+      return {
+        ...serializeUser(dealer),
+        reports: dealerReports,
+        createdAt,
+      };
+    });
+    res.status(200).json({ success: true, data: serializedDealers });
   } catch (e) {
     res.status(500).json({ success: false, data: e });
   }
+};
+
+const serializeUser = (user) => {
+  return {
+    name: user.name,
+    dealerId: user.dealerId,
+    state: user.state,
+  };
 };
 
 module.exports = { createReports, getReports, getMonthlyReports };

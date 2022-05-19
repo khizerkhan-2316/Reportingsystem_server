@@ -36,10 +36,18 @@ const formatDate = (dateToFormat) => {
   return moment(date).format('YYYY-MM-DD');
 };
 
+const getQuarter = () => {
+  const startOfQuarter = moment().startOf('quarter').format('YYYY-MM-DD');
+  const endOfQuarter = moment().endOf('quarter').format('YYYY-MM-DD');
+
+  return { startOfQuarter, endOfQuarter };
+};
+
 module.exports = {
   getFirstDayOfMonth,
   getLastDayOfMonth,
   getFirstDayOfPreviousMonth,
   getLastDayOfPreviousMonth,
   formatDate,
+  getQuarter,
 };

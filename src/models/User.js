@@ -4,7 +4,6 @@ const UserSchema = new Schema(
     dealerId: {
       type: Number,
       required: false,
-      unique: true,
     },
 
     name: {

@@ -71,7 +71,6 @@ const updateUser = async (req, res) => {
       .status(204)
       .json({ message: 'Updated Succesfully', success: true });
   } catch (e) {
-    console.log(e);
     res.status(400).json({ message: e, success: false });
   }
 };
@@ -171,4 +170,11 @@ const getUserDetails = (dealerId, name) => {
   };
 };
 
-module.exports = { getAllUsers, updateUser, updateAllUsers };
+module.exports = {
+  getAllUsers,
+  updateUser,
+  updateAllUsers,
+  insertUsers,
+  registerUser,
+  getUserDetails,
+};
