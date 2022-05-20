@@ -1,7 +1,7 @@
 const cors = require('cors');
 const express = require('express');
 const passport = require('passport');
-const morgan = require('morgan');
+//const morgan = require('morgan');
 const { startApp } = require('./startApp');
 
 //require('dotenv').config();
