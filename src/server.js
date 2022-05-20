@@ -4,7 +4,7 @@ const passport = require('passport');
 //const morgan = require('morgan');
 const { startApp } = require('./startApp');
 
-//require('dotenv').config();
+require('dotenv').config();
 
 //Production DB:
 const { DB } = require('./config/index.js');
