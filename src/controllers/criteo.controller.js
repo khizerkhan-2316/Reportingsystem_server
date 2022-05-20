@@ -1,9 +1,5 @@
 const axios = require('axios');
 const { body, criteoConfig } = require('../config/criteo.auth.config.js');
-const {
-  getFirstDayOfPreviousMonth,
-  getLastDayOfPreviousMonth,
-} = require('../helpers/date.js');
 const MonthlyStatsCriteo = require('../models/MonthlyStatsCriteo.js');
 
 const criteoToken = async () => {

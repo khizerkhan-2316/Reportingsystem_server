@@ -49,7 +49,6 @@ afterAll(async () => {
   await User.deleteOne({ dealerId: testUser.dealerId });
 });
 
-//hit route /api/criteo/stats and set admin authorization header with token from testAdmin.token and it should insert or update the last month data and is a POST request
 describe('Endpoint POST: /api/criteo/stats', () => {
   it('should insert or update the last month data', async () => {
     const response = await supertest(app)
@@ -69,7 +68,6 @@ describe('Endpoint POST: /api/criteo/stats', () => {
   });
 });
 
-// hit the route /api/criteo/stats with a get request and make a query string with a startdate and enddate and the test should insert data for criteo between the chosen dates where the startdate is the first day in month and the endate is the last day in the month. and add autorization header with testAdmin.token
 describe('Endpoint GET: /api/criteo/stats', () => {
   it('should insert data for criteo between the chosen dates', async () => {
     const response = await supertest(app)
@@ -102,7 +100,6 @@ describe('Endpoint GET: /api/criteo/stats', () => {
   });
 });
 
-// hit the route /api/criteo/stats/dashboard with a get request and add authorization header with testAdmin.token and the test should extract the nessecery data from DB related to criteo dashboard
 describe('Endpoint GET: /api/criteo/stats/dashboard', () => {
   it('should extract the nessecery data from DB related to criteo dashboard', async () => {
     const response = await supertest(app)

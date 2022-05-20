@@ -43,7 +43,6 @@ describe('Endpoint POST: /api/users/register-admin', () => {
     expect(newUser[0].email).toBe(testAdmin.email);
     expect(newUser[0].name).toBe(testAdmin.name);
     expect(newUser[0].username).toBe(testAdmin.username);
-    // await User.deleteOne({ email: testAdmin.email });
   });
 });
 
@@ -61,7 +60,6 @@ describe('Endpoint POST: /api/users/register-user', () => {
     expect(newUser[0].name).toBe(testUser.name);
     expect(newUser[0].username).toBe(testUser.username);
     expect(newUser[0].dealerId).toBe(testUser.dealerId);
-    //   await User.deleteOne({ dealerId: testUser.dealerId });
   });
 });
 
@@ -79,7 +77,6 @@ describe('Endpoint POST: /api/users/login-admin', () => {
   });
 });
 
-// it should login an user
 describe('Endpoint POST: /api/users/login-user', () => {
   it('should login an user', async () => {
     const response = await supertest(app)
@@ -94,7 +91,6 @@ describe('Endpoint POST: /api/users/login-user', () => {
   });
 });
 
-//hit the route /api/users/profile and get user details and add autorization with testuser.token
 describe('Endpoint GET: /api/users/profile', () => {
   it('should get the requesting users details', async () => {
     const response = await supertest(app)
@@ -109,7 +105,6 @@ describe('Endpoint GET: /api/users/profile', () => {
   });
 });
 
-// hit the route /api/users/admin ang get admin details and add autorization with testadmin.token
 describe('Endpoint GET: /api/users/admin', () => {
   it('should get the requesting admins details', async () => {
     const response = await supertest(app)
@@ -123,7 +118,6 @@ describe('Endpoint GET: /api/users/admin', () => {
   });
 });
 
-// hit the route /api/users/:id with testuser.dealerid as :id and set admin authorization testadmin.token and it should be a update/put method to update a user
 describe('Endpoint PUT: /api/users/:id', () => {
   it('should update a user', async () => {
     const response = await supertest(app)
@@ -144,8 +138,6 @@ describe('Endpoint PUT: /api/users/:id', () => {
     testUser.name = updatedUser[0].name;
     testUser.state = updatedUser[0].state;
     expect(updatedUser[0].name).toBe('test-dealer-updated');
-
-    // await User.deleteOne({ name: 'test-dealer-updated' });
   });
 });
 
@@ -164,7 +156,6 @@ describe('Endpoint GET: /api/users', () => {
   });
 });
 
-// hit the route /api/users with a post request and add a authorization with testadmin.token. It should not post anything in body
 describe('Endpoint POST: /api/users', () => {
   it('Should update/create users', async () => {
     const response = await supertest(app)

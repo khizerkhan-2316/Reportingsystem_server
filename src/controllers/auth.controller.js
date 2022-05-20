@@ -3,7 +3,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { SECRET } = require('../config/index.js');
 const passport = require('passport');
-const { registrationMail } = require('./Mail/RegistrationMail');
 const { validateUsername, validateEmail } = require('../helpers/validate.js');
 
 const registerUser = async (userDets, role, res) => {
@@ -36,13 +35,6 @@ const registerUser = async (userDets, role, res) => {
     });
 
     await newUser.save();
-    /*
-    const url =
-      role === 'user'
-        ? 'https://reporting-system.netlify.app/'
-        : 'https://reporting-system.netlify.app/admin';
-
-    await registrationMail(email, role, url); */
 
     return res.status(201).json({ message: 'User created', success: true });
   } catch (err) {

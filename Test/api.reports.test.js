@@ -4,10 +4,6 @@ const { app, DB, PORT } = require('./app');
 const User = require('../src/models/User');
 const Report = require('../src/models/Report');
 const { reportdata } = require('./reportdata');
-const {
-  getFirstDayOfMonth,
-  getLastDayOfMonth,
-} = require('../src/helpers/date');
 
 jest.setTimeout(150000);
 
@@ -55,8 +51,6 @@ afterAll(async () => {
   await User.deleteOne({ dealerId: testUser.dealerId });
 });
 
-// hit route /api/reports and add authorization header with testAdmin.token and the test should create rapports for dealers that have data in DB
-
 describe('Endpoint POST: /api/reports', () => {
   it('should create reports for dealers that have data in DB', async () => {
     const response = await supertest(app)
@@ -68,7 +62,6 @@ describe('Endpoint POST: /api/reports', () => {
   });
 });
 
-// hit route /api/reports/2349124 and add authorization header with testUser.token and the test should get reports for the dealer
 describe('Endpoint GET: /api/reports/:2349124', () => {
   it('should get reports for the dealer', async () => {
     const response = await supertest(app)
@@ -84,8 +77,6 @@ describe('Endpoint GET: /api/reports/:2349124', () => {
   });
 });
 
-// hite the route /api/reports/month with a get request and add a authorization header with testAdmin.token
-// the test should get this months created reports
 describe('Endpoint GET: /api/reports/month', () => {
   it('should get this months created reports', async () => {
     const response = await supertest(app)

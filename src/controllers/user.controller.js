@@ -1,6 +1,5 @@
 const User = require('../models/User');
 const Dealer = require('../models/Dealer');
-const MonthlyStatsCriteo = require('../models/MonthlyStatsCriteo');
 const {
   getFirstDayOfPreviousMonth,
   getLastDayOfPreviousMonth,
@@ -12,7 +11,8 @@ const {
   validateUsernameForUpdate,
   validateEmailForUpdate,
 } = require('../helpers/validate.js');
-const { use } = require('passport');
+
+const updateAllDealers = require('../controllers/dealer.controller');
 
 const getAllUsers = async (res, role, serializeUser) => {
   return res
@@ -75,11 +75,13 @@ const updateUser = async (req, res) => {
   }
 };
 
-const updateAdminUser = (res, role) => {};
-
 const updateAllUsers = async (res, role) => {
   try {
-    const dealers = await Dealer.find({});
+    let dealers = await Dealer.find({});
+
+    if (dealers.length === 0) {
+      await updateAllDealers();
+    }
     const users = await User.find({ role: role });
     const stats = await getSpeceficStatsFromDB(
       getFirstDayOfPreviousMonth(),
