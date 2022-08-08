@@ -1,15 +1,12 @@
 const cors = require('cors');
 const express = require('express');
 const passport = require('passport');
-//const morgan = require('morgan');
+const morgan = require('morgan');
 const { startApp } = require('./startApp');
 
 require('dotenv').config();
 
-//Production DB:
-const { DB } = require('./config/index.js');
-
-//const { DB } = require('./config/LocalConfig.js');
+const { DB } = require('./config/LocalConfig.js');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -20,7 +17,7 @@ process.on('uncaughtException', function (error) {
 app.use(cors());
 app.use(express.json());
 app.use(passport.initialize());
-//app.use(morgan('tiny'));
+app.use(morgan('tiny'));
 
 require('./middlewares/passport.js')(passport);
 

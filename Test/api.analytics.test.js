@@ -24,7 +24,7 @@ const testUser = {
 };
 
 beforeAll(async () => {
-  await startApp(app, DB, 5678);
+  await startApp(app, DB, 10000);
 
   await supertest(app).post('/api/users/register-admin').send(testAdmin);
 
